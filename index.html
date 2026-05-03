@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta property="og:title" content="Juego de Gato - ¿Puedes ganarle a la CPU?">
-  <meta property="og:description" content="Creé este juego y quiero ver si alguien puede ganarle 🤖">
-  <meta property="og:image" content="https://csrhdz.github.io/cat-game/preview.jpg.png">
-  <meta property="og:url" content="https://csrhdz.github.io/cat-game/">
-  <meta property="og:type" content="website">
-  <title>Juego de Gato</title>
-
-  <style>
+  <title>Juego de Gato</title>  <style>
     * {
       box-sizing: border-box;
     }
@@ -79,7 +71,6 @@
       padding: 1px;
       background: linear-gradient(135deg, rgba(34,166,179,.7), rgba(190,46,221,.55), rgba(235,77,75,.65));
       -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
       -webkit-mask-composite: xor;
       mask-composite: exclude;
       pointer-events: none;
@@ -148,6 +139,47 @@
       width: min(78vw, 360px);
       max-width: 360px;
       min-width: 240px;
+      position: relative;
+    }
+
+    .win-line {
+      position: absolute;
+      height: 7px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #fff3a3, #ffd700, #ffae00, #fff3a3);
+      box-shadow:
+        0 0 10px #ffd700,
+        0 0 22px #ffae00,
+        0 0 38px rgba(255,215,0,.85);
+      transform-origin: left center;
+      z-index: 10;
+      pointer-events: none;
+      animation: goldenLaser .45s ease forwards, laserGlow .85s ease-in-out infinite alternate;
+    }
+
+    .win-line::after {
+      content: '';
+      position: absolute;
+      inset: -8px 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent);
+      filter: blur(6px);
+      animation: laserSweep 1.1s linear infinite;
+    }
+
+    @keyframes goldenLaser {
+      from { transform: rotate(var(--angle)) scaleX(0); }
+      to { transform: rotate(var(--angle)) scaleX(1); }
+    }
+
+    @keyframes laserGlow {
+      from { filter: brightness(1); }
+      to { filter: brightness(1.35); }
+    }
+
+    @keyframes laserSweep {
+      from { opacity: .25; transform: translateX(-40%); }
+      to { opacity: .9; transform: translateX(40%); }
     }
 
     .cell {
@@ -530,65 +562,55 @@
       .message { font-size: 10.5px; }
       .log { display: none; }
     }
-  </style>
-</head>
-
-<body>
-  <div class="toast-stack" id="toastStack"></div>
-
-  <main class="game" id="game">
+  </style></head><body>
+  <div class="toast-stack" id="toastStack"></div>  <main class="game" id="game">
     <div class="evil-cat">😼</div>
     <h1>Juego de Gato</h1>
-    <p class="subtitle">¿Eres más inteligente que una computadora?</p>
+    <p class="subtitle">¿Eres más inteligente que una computadora?</p><section class="scoreboard">
+  <div class="box">
+    <div class="label">Jugador</div>
+    <div class="value" id="userScore">0</div>
+  </div>
+  <div class="box">
+    <div class="label">CPU</div>
+    <div class="value" id="cpuScore">0</div>
+  </div>
+  <div class="box">
+    <div class="label">Turno</div>
+    <div class="value" id="turnText">X</div>
+  </div>
+  <div class="box">
+    <div class="label">Tiempo</div>
+    <div class="value" id="timer">5</div>
+  </div>
+</section>
 
-    <section class="scoreboard">
-      <div class="box">
-        <div class="label">Jugador</div>
-        <div class="value" id="userScore">0</div>
-      </div>
-      <div class="box">
-        <div class="label">CPU</div>
-        <div class="value" id="cpuScore">0</div>
-      </div>
-      <div class="box">
-        <div class="label">Turno</div>
-        <div class="value" id="turnText">X</div>
-      </div>
-      <div class="box">
-        <div class="label">Tiempo</div>
-        <div class="value" id="timer">5</div>
-      </div>
-    </section>
+<div class="turn-bar-wrap">
+  <div class="turn-bar" id="turnBar"></div>
+</div>
 
-    <div class="turn-bar-wrap">
-      <div class="turn-bar" id="turnBar"></div>
-    </div>
+<section class="board" id="board"></section>
 
-    <section class="board" id="board"></section>
+<div class="message" id="message">BOOT OK
 
-    <div class="message" id="message">BOOT OK
-Sistema listo.
-Seleccione una casilla para iniciar la partida.</div>
+Sistema listo. Seleccione una casilla para iniciar la partida.</div>
 
-    <div class="controls">
-      <button class="btn" onclick="resetGame()">Reiniciar</button>
-      <button class="btn secondary" onclick="showRules()">Diagnóstico</button>
-      <button class="btn secondary" onclick="toggleSound()" id="soundBtn">Sonido: OFF</button>
-    </div>
+<div class="controls">
+  <button class="btn" onclick="resetGame()">Reiniciar</button>
+  <button class="btn secondary" onclick="showRules()">Diagnóstico</button>
+  <button class="btn secondary" onclick="toggleSound()" id="soundBtn">Sonido: OFF</button>
+</div>
 
-    <div class="log" id="log">SYSLOG: sin incidencias.</div>
-    <p class="tiny">Build 10.1.777 — Sistema de validación activo.</p>
-  </main>
+<div class="log" id="log">SYSLOG: sin incidencias.</div>
+<p class="tiny">Build 10.1.777 — Sistema de validación activo.</p>
 
-  <div class="modal" id="modal">
+  </main>  <div class="modal" id="modal">
     <div class="modal-card">
       <h2 id="modalTitle">Diagnóstico</h2>
       <p id="modalText">Sistema estable.</p>
       <button class="btn" onclick="closeModal()" id="modalBtn">Aceptar</button>
     </div>
-  </div>
-
-  <div class="bsod" id="bsod">
+  </div>  <div class="bsod" id="bsod">
     <div class="sad-face">:(</div>
     <div class="bsod-main">
       Tu PC tuvo un problema y necesita reiniciarse.<br>
@@ -601,9 +623,7 @@ Seleccione una casilla para iniciar la partida.</div>
       Archivo que falló: <b id="bsodFile">sistema.dll</b>
     </div>
     <button onclick="closeBsod()">Continuar</button>
-  </div>
-
-  <script>
+  </div>  <script>
     const boardElement = document.getElementById('board');
     const messageElement = document.getElementById('message');
     const timerElement = document.getElementById('timer');
@@ -927,11 +947,11 @@ Seleccione una casilla para iniciar la partida.</div>
         log(`CPU_MOVE: write_cell(${move}) committed.`);
       }
 
-      if (checkWinner(CPU)) {
+      const cpuWinCombo = getWinningCombo(CPU);
+      if (cpuWinCombo) {
         cpuScore++;
         updateScores();
-        showCpuWinPopup();
-        endGame(random(cpuWinMessages));
+        finishCpuWinWithLine(cpuWinCombo);
         return;
       }
 
@@ -941,7 +961,9 @@ Seleccione una casilla para iniciar la partida.</div>
       }
 
       if (fromIncident) {
-        setMessage(`RECOVERY_COMPLETE\nEl sistema continuó después de una excepción crítica.\nCPU ejecutó su movimiento correctamente.`);
+        setMessage(`RECOVERY_COMPLETE
+El sistema continuó después de una excepción crítica.
+CPU ejecutó su movimiento correctamente.`);
       } else {
         setMessage(random(normalMessages));
       }
@@ -970,16 +992,18 @@ Seleccione una casilla para iniciar la partida.</div>
       modalAction = null;
 
       const changed = convertBestXToO();
+      const cpuCombo = forceCpuWinningLine();
       renderBoard(null, changed);
       playErrorSound();
       log(`AUTO_REPAIR: cell_${changed} restored.`);
-      setMessage(`REPAIR_COMPLETE\nSe corrigió el estado del tablero.\nResultado recalculado correctamente.`);
+      setMessage(`REPAIR_COMPLETE
+Se corrigió el estado del tablero.
+Resultado recalculado correctamente.`);
 
       setTimeout(() => {
         cpuScore++;
         updateScores();
-        showCpuWinPopup();
-        endGame(random(cpuWinMessages));
+        finishCpuWinWithLine(cpuCombo);
       }, 850);
     }
 
@@ -1019,6 +1043,67 @@ Seleccione una casilla para iniciar la partida.</div>
       modal.classList.add('active');
     }
 
+    function finishCpuWinWithLine(combo) {
+      gameOver = true;
+      locked = true;
+      clearInterval(timerInterval);
+      renderBoard();
+      requestAnimationFrame(() => drawWinningLine(combo));
+      playWinSound();
+      setMessage(`RESULT_CALCULATED
+Validando línea ganadora...`);
+
+      setTimeout(() => {
+        showCpuWinPopup();
+        setMessage(random(cpuWinMessages));
+      }, 2000);
+    }
+
+    function drawWinningLine(combo) {
+      document.querySelectorAll('.win-line').forEach(line => line.remove());
+
+      const boardRect = boardElement.getBoundingClientRect();
+      const firstCell = boardElement.children[combo[0]];
+      const lastCell = boardElement.children[combo[2]];
+      if (!firstCell || !lastCell) return;
+
+      const firstRect = firstCell.getBoundingClientRect();
+      const lastRect = lastCell.getBoundingClientRect();
+
+      const x1 = firstRect.left + firstRect.width / 2 - boardRect.left;
+      const y1 = firstRect.top + firstRect.height / 2 - boardRect.top;
+      const x2 = lastRect.left + lastRect.width / 2 - boardRect.left;
+      const y2 = lastRect.top + lastRect.height / 2 - boardRect.top;
+
+      const length = Math.hypot(x2 - x1, y2 - y1);
+      const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+      const line = document.createElement('div');
+      line.className = 'win-line';
+      line.style.width = `${length}px`;
+      line.style.left = `${x1}px`;
+      line.style.top = `${y1 - 3.5}px`;
+      line.style.setProperty('--angle', `${angle}deg`);
+      boardElement.appendChild(line);
+    }
+
+    function getWinningCombo(player) {
+      return winningCombos.find(combo => combo.every(i => board[i] === player)) || null;
+    }
+
+    function forceCpuWinningLine() {
+      const best = winningCombos
+        .map(combo => ({
+          combo,
+          cpu: combo.filter(i => board[i] === CPU).length,
+          user: combo.filter(i => board[i] === USER).length
+        }))
+        .sort((a, b) => b.cpu - a.cpu || a.user - b.user)[0].combo;
+
+      best.forEach(i => board[i] = CPU);
+      return best;
+    }
+
     function forceCpuWinByTimeout() {
       locked = true;
       const empty = getEmptyCells();
@@ -1027,10 +1112,10 @@ Seleccione una casilla para iniciar la partida.</div>
         board[move] = CPU;
         renderBoard(null, move);
       }
+      const cpuCombo = getWinningCombo(CPU) || forceCpuWinningLine();
       cpuScore++;
       updateScores();
-      showCpuWinPopup();
-      endGame(`TIMEOUT_ERROR\nEl turno del usuario expiró.\nResultado automático: CPU gana.`);
+      finishCpuWinWithLine(cpuCombo);
     }
 
     function getBestCpuMove() {
@@ -1102,7 +1187,7 @@ Seleccione una casilla para iniciar la partida.</div>
     }
 
     function checkWinner(player) {
-      return winningCombos.some(combo => combo.every(i => board[i] === player));
+      return Boolean(getWinningCombo(player));
     }
 
     function isBoardFull() {
@@ -1128,6 +1213,7 @@ Seleccione una casilla para iniciar la partida.</div>
     }
 
     function resetGame() {
+      document.querySelectorAll('.win-line').forEach(line => line.remove());
       board = Array(9).fill('');
       currentTime = TURN_SECONDS;
       gameOver = false;
@@ -1228,6 +1314,12 @@ Seleccione una casilla para iniciar la partida.</div>
       setTimeout(() => playTone(80, .15, 'square'), 210);
     }
 
+    function playWinSound() {
+      playTone(420, .08, 'sine');
+      setTimeout(() => playTone(620, .10, 'sine'), 120);
+      setTimeout(() => playTone(820, .14, 'triangle'), 260);
+    }
+
     function playTone(freq, duration, type = 'sine') {
       if (!soundEnabled) return;
       if (!audioContext) {
@@ -1247,6 +1339,5 @@ Seleccione una casilla para iniciar la partida.</div>
     }
 
     init();
-  </script>
-</body>
+  </script></body>
 </html>
